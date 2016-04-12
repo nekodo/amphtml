@@ -31,18 +31,25 @@ export function doubleclick(global, data) {
     'consentNotificationId', 'useSameDomainRenderingUntilDeprecated',
   ]);
 
-  if (data.useSameDomainRenderingUntilDeprecated != undefined) {
-    doubleClickWithGpt(global, data, false);
-  } else {
-    const dice = Math.random();
-    const href = global.context.location.href;
-    if ((href.indexOf('google_glade=1') > 0 || dice < experimentFraction)
-        && href.indexOf('google_glade=0') < 0) {
-      doubleClickWithGlade(global, data);
+  const stopObserving = global.context.observeIntersection(changes => {
+    // First export the geometric information.
+    global.ampAdGeometry = changes[0];
+    // Unregister the listener.
+    stopObserving();
+
+    if (data.useSameDomainRenderingUntilDeprecated != undefined) {
+      doubleClickWithGpt(global, data, false);
     } else {
-      doubleClickWithGpt(global, data, dice < 2 * experimentFraction);
+      const dice = Math.random();
+      const href = global.context.location.href;
+      if ((href.indexOf('google_glade=1') > 0 || dice < experimentFraction)
+          && href.indexOf('google_glade=0') < 0) {
+        doubleClickWithGlade(global, data);
+      } else {
+        doubleClickWithGpt(global, data, dice < 2 * experimentFraction);
+      }
     }
-  }
+  });
 }
 
 /**
