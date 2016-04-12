@@ -31,7 +31,9 @@ export function doubleclick(global, data) {
     'consentNotificationId', 'useSameDomainRenderingUntilDeprecated',
   ]);
 
+  console.time('waiting_' + window.name);
   const stopObserving = global.context.observeIntersection(changes => {
+    console.timeEnd('waiting_' + window.name);
     // First export the geometric information.
     global.ampAdGeometry = changes[0];
     // Unregister the listener.
